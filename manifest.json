@@ -1,0 +1,9 @@
+{
+  "name": "MAR MUSIC",
+  "short_name": "MAR MUSIC",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f4f8ff",
+  "theme_color": "#0b57d0",
+  "icons": []
+}
