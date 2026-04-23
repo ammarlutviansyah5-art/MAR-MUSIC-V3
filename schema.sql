@@ -1,0 +1,49 @@
+CREATE TABLE IF NOT EXISTS users (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email TEXT UNIQUE NOT NULL,
+  otp_verified_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS playlists (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  title TEXT NOT NULL DEFAULT 'My Playlist',
+  cover_url TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS tracks (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  artist TEXT,
+  file_path TEXT NOT NULL,
+  file_name TEXT NOT NULL,
+  file_size BIGINT NOT NULL DEFAULT 0,
+  mime_type TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS playlist_tracks (
+  playlist_id UUID NOT NULL REFERENCES playlists(id) ON DELETE CASCADE,
+  track_id UUID NOT NULL REFERENCES tracks(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (playlist_id, track_id)
+);
+
+CREATE TABLE IF NOT EXISTS markers (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  track_id UUID NOT NULL REFERENCES tracks(id) ON DELETE CASCADE,
+  position NUMERIC NOT NULL DEFAULT 0,
+  label TEXT DEFAULT 'flag',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS sync_states (
+  user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  payload JSONB NOT NULL DEFAULT '{}'::jsonb,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
